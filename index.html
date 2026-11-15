@@ -1,1 +1,1952 @@
-Just for testing
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SONI DIGITAL IMAGE STUDIO — All-in-One Pro Image Utility Suite</title>
+  <!-- Tailwind CSS CDN for rapid responsive layout -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       CSS VARIABLES & THEME SYSTEM (LIGHT & DARK MODE)
+       ========================================================================== */
+    :root {
+      --bg-app: #0b0f19;
+      --bg-sidebar: #111827;
+      --bg-card: #161f33;
+      --bg-card-hover: #1e2942;
+      --bg-input: #0f172a;
+      --border-color: #26334d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-primary: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59, 130, 246, 0.25);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --checker-1: #1e293b;
+      --checker-2: #0f172a;
+    }
+
+    [data-theme="light"] {
+      --bg-app: #f1f5f9;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --bg-input: #f8fafc;
+      --border-color: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-glow: rgba(37, 99, 235, 0.18);
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --checker-1: #e2e8f0;
+      --checker-2: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-app);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Theme Utility Classes */
+    .surface-sidebar { background-color: var(--bg-sidebar); border-color: var(--border-color); }
+    .surface-card { background-color: var(--bg-card); border-color: var(--border-color); }
+    .surface-input { background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-primary); }
+    .text-main { color: var(--text-primary); }
+    .text-sub { color: var(--text-secondary); }
+    .text-dim { color: var(--text-muted); }
+    .border-theme { border-color: var(--border-color); }
+
+    /* Checkerboard background for transparent images */
+    .checkerboard {
+      background-color: var(--checker-2);
+      background-image:
+        linear-gradient(45deg, var(--checker-1) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--checker-1) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--checker-1) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--checker-1) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    /* Range Slider Styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--border-color);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      cursor: pointer;
+      box-shadow: 0 0 0 4px var(--accent-glow);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+
+    /* Active Navigation Pill */
+    .nav-btn.active {
+      background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
+      color: #ffffff;
+      box-shadow: 0 4px 14px var(--accent-glow);
+      border-color: transparent;
+    }
+    .nav-btn:not(.active):hover {
+      background-color: var(--bg-card-hover);
+    }
+
+    /* Toast Notification */
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast-item {
+      pointer-events: auto;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-primary);
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+      font-size: 0.875rem;
+      font-weight: 500;
+      animation: slideIn 0.25s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Interactive Crop Overlay */
+    #crop-canvas {
+      cursor: crosshair;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ========================================================================
+       TOP HEADER BAR
+       ======================================================================== -->
+  <header class="surface-sidebar border-b sticky top-0 z-40 px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl surface-card border text-main hover:opacity-80" aria-label="Toggle Menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="4"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 15l-5-5L5 21"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-none bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            SONI DIGITAL IMAGE STUDIO
+          </h1>
+          <p class="text-[11px] text-sub font-medium mt-0.5">
+            100% Offline & Free Forever • प्रोफेशनल इमेज टूल्स
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Right Actions -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Upload New Image Quick Button -->
+      <button id="header-upload-btn" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+        </svg>
+        <span class="hidden sm:inline">Upload Image</span>
+        <span class="sm:hidden">Upload</span>
+      </button>
+
+      <!-- Copy Full HTML Source Code Button -->
+      <button id="open-code-modal-btn" class="px-3 py-2 rounded-xl surface-card border text-xs sm:text-sm font-semibold flex items-center gap-1.5 hover:border-blue-500 transition" title="Get full single-file HTML code">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+        </svg>
+        <span class="hidden md:inline">Copy HTML Code</span>
+      </button>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle-btn" class="p-2.5 rounded-xl surface-card border text-main hover:border-blue-500 transition" title="Toggle Dark/Light Theme">
+        <svg id="theme-icon-sun" class="w-4 h-4 hidden text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+        </svg>
+        <svg id="theme-icon-moon" class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hidden Global File Input -->
+  <input type="file" id="global-file-input" accept="image/*" class="hidden" />
+
+  <!-- ========================================================================
+       MAIN WORKSPACE CONTAINER
+       ======================================================================== -->
+  <div class="flex-1 flex relative">
+
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="surface-sidebar border-r w-72 shrink-0 flex flex-col justify-between fixed lg:static inset-y-0 left-0 z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 pt-16 lg:pt-0">
+      <div class="p-3 space-y-1.5 overflow-y-auto">
+        <div class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-dim">
+          8 Pro Image Tools (सभी टूल्स)
+        </div>
+
+        <button class="nav-btn active w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="compress">
+          <span class="text-lg">🗜️</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Image Compressor</div>
+            <div class="text-[11px] opacity-80">फोटो का साइज़ (KB) कम करें</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="convert">
+          <span class="text-lg">🔄</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Format Converter</div>
+            <div class="text-[11px] opacity-80">JPG, PNG, WEBP, BMP, ICO</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="resize">
+          <span class="text-lg">📐</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Image Resizer & Presets</div>
+            <div class="text-[11px] opacity-80">Passport, PAN, Signature, Pixel</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="crop">
+          <span class="text-lg">✂️</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Crop, Rotate & Flip</div>
+            <div class="text-[11px] opacity-80">इमेज काटें, घुमाएं व सीधा करें</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="filters">
+          <span class="text-lg">🎨</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Filters & Color Adjust</div>
+            <div class="text-[11px] opacity-80">Brightness, Scan, B&W, Contrast</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="watermark">
+          <span class="text-lg">©️</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Watermark & Text Adder</div>
+            <div class="text-[11px] opacity-80">फोटो पर नाम या लोगो लगाएं</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="base64">
+          <span class="text-lg">🧬</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Base64 & Color Picker</div>
+            <div class="text-[11px] opacity-80">HEX कलर और Base64 कोड निकालें</div>
+          </div>
+        </button>
+
+        <button class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl border border-transparent flex items-center gap-3 transition" data-tool="passport">
+          <span class="text-lg">🪪</span>
+          <div>
+            <div class="text-sm font-semibold leading-tight">Passport Sheet & Merge</div>
+            <div class="text-[11px] opacity-80">A4/4x6 पासपोर्ट शीट व फोटो जोड़ें</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Sidebar Footer Privacy Note -->
+      <div class="p-3 border-t border-theme">
+        <div class="surface-card border rounded-xl p-3 text-xs space-y-1">
+          <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+            <span>🔒</span> 100% Private & Local
+          </div>
+          <p class="text-sub text-[11px] leading-relaxed">
+            आपकी कोई भी फोटो किसी सर्वर पर अपलोड नहीं होती। सब कुछ आपके ब्राउज़र में प्रोसेस होता है।
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Backdrop -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-20 hidden lg:hidden"></div>
+
+    <!-- ======================================================================
+         MAIN CONTENT AREA
+         ====================================================================== -->
+    <main class="flex-1 p-4 sm:p-6 overflow-y-auto max-w-full">
+
+      <!-- 1. DRAG & DROP UPLOAD ZONE (Shown prominently if no image loaded, or collapsible bar) -->
+      <div id="dropzone-hero" class="surface-card border-2 border-dashed border-blue-500/50 hover:border-blue-500 rounded-2xl p-8 sm:p-12 text-center cursor-pointer transition-all mb-6 group">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold mb-1">Drag & Drop Your Image Here (फोटो यहाँ डालें)</h2>
+        <p class="text-sub text-sm mb-5">Supports JPG, PNG, WEBP, BMP, GIF, SVG • Paste with <kbd class="px-1.5 py-0.5 rounded surface-input border text-xs">Ctrl+V</kbd></p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button type="button" id="hero-select-btn" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-lg transition">
+            Select Image from Device
+          </button>
+          <button type="button" id="load-sample-btn" class="px-4 py-2.5 rounded-xl surface-input border hover:border-blue-500 text-sm font-medium transition">
+            Try Sample Photo (डेमो फोटो)
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. ACTIVE WORKSPACE (Visible once an image is loaded) -->
+      <div id="studio-workspace" class="hidden space-y-5">
+
+        <!-- Top Stats & Action Bar -->
+        <div class="surface-card border rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-dim font-semibold">File Name</div>
+              <div id="stat-filename" class="text-sm font-bold truncate max-w-[160px] sm:max-w-[220px]">image.jpg</div>
+            </div>
+            <div class="h-8 w-px bg-slate-700/50 hidden sm:block"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-dim font-semibold">Dimensions</div>
+              <div id="stat-dimensions" class="text-sm font-bold text-blue-400">1920 × 1080 px</div>
+            </div>
+            <div class="h-8 w-px bg-slate-700/50 hidden sm:block"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-dim font-semibold">Original Size</div>
+              <div id="stat-orig-size" class="text-sm font-bold">0 KB</div>
+            </div>
+            <div class="h-8 w-px bg-slate-700/50 hidden sm:block"></div>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-dim font-semibold">New Output Size</div>
+              <div class="flex items-center gap-2">
+                <span id="stat-new-size" class="text-sm font-extrabold text-emerald-400">0 KB</span>
+                <span id="stat-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">-0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Global Download & Reset Controls -->
+          <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+            <button id="apply-to-base-btn" class="px-3.5 py-2.5 rounded-xl surface-input border hover:border-blue-500 text-xs sm:text-sm font-semibold transition" title="Use current output as input for another tool">
+              ✓ Apply Changes
+            </button>
+            <button id="reset-all-btn" class="px-3.5 py-2.5 rounded-xl surface-input border hover:border-amber-500 text-xs sm:text-sm font-semibold transition" title="Revert to original uploaded photo">
+              ↺ Reset
+            </button>
+            <button id="download-btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg flex items-center gap-2 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Download Image
+            </button>
+          </div>
+        </div>
+
+        <!-- MAIN TWO-COLUMN EDITOR GRID -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+
+          <!-- LEFT: TOOL CONTROLS PANEL (5 cols on XL) -->
+          <div class="xl:col-span-5 surface-card border rounded-2xl p-5 space-y-5">
+
+            <!-- TOOL 1: IMAGE COMPRESSOR -->
+            <section id="panel-compress" class="tool-panel space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">🗜️ Smart Image Compressor</h3>
+                <p class="text-xs text-sub">क्वालिटी और फाइल साइज़ (KB) को अपनी ज़रूरत के हिसाब से कम करें।</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-sm font-semibold mb-1.5">
+                  <label for="comp-quality">Compression Quality</label>
+                  <span id="comp-quality-val" class="text-blue-400 font-bold">80%</span>
+                </div>
+                <input type="range" id="comp-quality" min="1" max="100" value="80" />
+                <div class="flex justify-between text-[11px] text-dim mt-1">
+                  <span>Smallest Size (1%)</span>
+                  <span>Balanced (75%)</span>
+                  <span>Max Quality (100%)</span>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-sub mb-1.5">Output Format</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" class="comp-fmt-btn py-2 px-3 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-600" data-fmt="image/jpeg">JPG (Best for Photos)</button>
+                  <button type="button" class="comp-fmt-btn py-2 px-3 rounded-xl border surface-input text-xs font-bold" data-fmt="image/webp">WEBP (Ultra Small)</button>
+                </div>
+              </div>
+
+              <!-- Target KB Auto-Finder -->
+              <div class="surface-input border rounded-xl p-3.5 space-y-2.5">
+                <div class="text-xs font-bold text-main">🎯 Target File Size Auto-Optimizer (KB में सेट करें)</div>
+                <div class="flex gap-2">
+                  <input type="number" id="target-kb-input" placeholder="e.g. 50" min="5" max="10000" class="w-full px-3 py-2 rounded-lg surface-card border text-sm outline-none focus:border-blue-500" />
+                  <button type="button" id="target-kb-btn" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0">
+                    Auto Fit KB
+                  </button>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  <button type="button" class="kb-quick-btn px-2.5 py-1 rounded-md surface-card border text-[11px] hover:border-blue-500" data-kb="20">20 KB (Sign)</button>
+                  <button type="button" class="kb-quick-btn px-2.5 py-1 rounded-md surface-card border text-[11px] hover:border-blue-500" data-kb="50">50 KB (Form)</button>
+                  <button type="button" class="kb-quick-btn px-2.5 py-1 rounded-md surface-card border text-[11px] hover:border-blue-500" data-kb="100">100 KB</button>
+                  <button type="button" class="kb-quick-btn px-2.5 py-1 rounded-md surface-card border text-[11px] hover:border-blue-500" data-kb="200">200 KB</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- TOOL 2: FORMAT CONVERTER -->
+            <section id="panel-convert" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">🔄 Image Format Converter</h3>
+                <p class="text-xs text-sub">इमेज को JPG, PNG, WEBP, BMP या Favicon ICO में बदलें।</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-sub mb-2">Choose Target Format</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" class="conv-fmt-btn py-2.5 px-2 rounded-xl border text-xs font-bold bg-blue-600 text-white border-blue-600" data-fmt="image/png" data-ext="png">PNG</button>
+                  <button type="button" class="conv-fmt-btn py-2.5 px-2 rounded-xl border surface-input text-xs font-bold" data-fmt="image/jpeg" data-ext="jpg">JPG / JPEG</button>
+                  <button type="button" class="conv-fmt-btn py-2.5 px-2 rounded-xl border surface-input text-xs font-bold" data-fmt="image/webp" data-ext="webp">WEBP</button>
+                  <button type="button" class="conv-fmt-btn py-2.5 px-2 rounded-xl border surface-input text-xs font-bold" data-fmt="image/bmp" data-ext="bmp">BMP</button>
+                  <button type="button" class="conv-fmt-btn py-2.5 px-2 rounded-xl border surface-input text-xs font-bold" data-fmt="image/x-icon" data-ext="ico">ICO (64x64)</button>
+                </div>
+              </div>
+
+              <div id="conv-bg-wrapper" class="surface-input border rounded-xl p-3.5 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="conv-bg-color" class="text-xs font-semibold">Transparent Background Fill Color (JPG/BMP के लिए)</label>
+                  <input type="color" id="conv-bg-color" value="#ffffff" class="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
+                </div>
+                <p class="text-[11px] text-dim">PNG से JPG बदलते समय पारदर्शी हिस्सा इस रंग से भर जाएगा।</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                  <span>Export Quality (JPG/WEBP)</span>
+                  <span id="conv-quality-val" class="text-blue-400">92%</span>
+                </div>
+                <input type="range" id="conv-quality" min="10" max="100" value="92" />
+              </div>
+            </section>
+
+            <!-- TOOL 3: IMAGE RESIZER & PRESETS -->
+            <section id="panel-resize" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">📐 Image Resizer & Exam Presets</h3>
+                <p class="text-xs text-sub">पिक्सेल (px), प्रतिशत (%) या सरकारी फॉर्म के प्रीसेट से साइज़ बदलें।</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-sub mb-1">Width (चौड़ाई px)</label>
+                  <input type="number" id="resize-w" min="1" max="10000" class="w-full px-3 py-2 rounded-xl surface-input border text-sm font-bold" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-sub mb-1">Height (ऊंचाई px)</label>
+                  <input type="number" id="resize-h" min="1" max="10000" class="w-full px-3 py-2 rounded-xl surface-input border text-sm font-bold" />
+                </div>
+              </div>
+
+              <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer select-none">
+                <input type="checkbox" id="resize-lock-ratio" checked class="w-4 h-4 rounded accent-blue-600" />
+                <span>Lock Aspect Ratio (अनुपात लॉक रखें)</span>
+              </label>
+
+              <div>
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                  <span>Scale by Percentage</span>
+                  <span id="resize-pct-val" class="text-blue-400 font-bold">100%</span>
+                </div>
+                <input type="range" id="resize-pct" min="10" max="200" value="100" />
+              </div>
+
+              <div class="space-y-2">
+                <div class="text-xs font-bold text-sub">🇮🇳 Quick Indian Form & Social Presets:</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" class="resize-preset-btn text-left p-2.5 rounded-xl surface-input border hover:border-blue-500 transition" data-w="413" data-h="531">
+                    <div class="text-xs font-bold">Passport Photo</div>
+                    <div class="text-[10px] text-dim">3.5×4.5cm (413×531 px)</div>
+                  </button>
+                  <button type="button" class="resize-preset-btn text-left p-2.5 rounded-xl surface-input border hover:border-blue-500 transition" data-w="213" data-h="213">
+                    <div class="text-xs font-bold">PAN Card Photo</div>
+                    <div class="text-[10px] text-dim">2.5×2.5cm (213×213 px)</div>
+                  </button>
+                  <button type="button" class="resize-preset-btn text-left p-2.5 rounded-xl surface-input border hover:border-blue-500 transition" data-w="140" data-h="60">
+                    <div class="text-xs font-bold">Signature (SSC/UPSC)</div>
+                    <div class="text-[10px] text-dim">140 × 60 px</div>
+                  </button>
+                  <button type="button" class="resize-preset-btn text-left p-2.5 rounded-xl surface-input border hover:border-blue-500 transition" data-w="1080" data-h="1080">
+                    <div class="text-xs font-bold">Instagram Square</div>
+                    <div class="text-[10px] text-dim">1080 × 1080 px</div>
+                  </button>
+                  <button type="button" class="resize-preset-btn text-left p-2.5 rounded-xl surface-input border hover:border-blue-500 transition" data-w="1920" data-h="1080">
+                    <div class="text-xs font-bold">Full HD (1080p)</div>
+                    <div class="text-[10px] text-dim">1920 × 1080 px</div>
+                  </button>
+                  <button type="button" class="resize-preset-btn text-left p-2.5 rounded-xl surface-input border hover:border-blue-500 transition" data-w="2480" data-h="3508">
+                    <div class="text-xs font-bold">A4 Document (300DPI)</div>
+                    <div class="text-[10px] text-dim">2480 × 3508 px</div>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- TOOL 4: CROP, ROTATE & FLIP -->
+            <section id="panel-crop" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">✂️ Crop, Rotate & Flip</h3>
+                <p class="text-xs text-sub">प्रिव्यू इमेज पर माउस/उंगली से एरिया चुनें या रोटेट करें।</p>
+              </div>
+
+              <div>
+                <div class="text-xs font-semibold text-sub mb-1.5">Crop Aspect Ratio</div>
+                <div class="grid grid-cols-5 gap-1.5">
+                  <button type="button" class="crop-ratio-btn py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold" data-ratio="free">Free</button>
+                  <button type="button" class="crop-ratio-btn py-1.5 rounded-lg surface-input border text-xs font-bold" data-ratio="1">1:1</button>
+                  <button type="button" class="crop-ratio-btn py-1.5 rounded-lg surface-input border text-xs font-bold" data-ratio="1.3333">4:3</button>
+                  <button type="button" class="crop-ratio-btn py-1.5 rounded-lg surface-input border text-xs font-bold" data-ratio="1.7777">16:9</button>
+                  <button type="button" class="crop-ratio-btn py-1.5 rounded-lg surface-input border text-xs font-bold" data-ratio="0.7777">3.5:4.5</button>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button type="button" id="exec-crop-btn" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow">
+                  ✂️ Crop Selected Area
+                </button>
+                <button type="button" id="reset-crop-box-btn" class="px-3 py-2.5 rounded-xl surface-input border text-xs font-semibold">
+                  Reset Box
+                </button>
+              </div>
+
+              <div class="border-t border-theme pt-3 space-y-3">
+                <div class="text-xs font-semibold text-sub">Rotate & Flip Controls</div>
+                <div class="grid grid-cols-4 gap-2">
+                  <button type="button" id="rot-left-btn" class="py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold">↺ -90°</button>
+                  <button type="button" id="rot-right-btn" class="py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold">↻ +90°</button>
+                  <button type="button" id="flip-h-btn" class="py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold">⇆ Flip H</button>
+                  <button type="button" id="flip-v-btn" class="py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold">⇅ Flip V</button>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span>Fine Angle Rotation</span>
+                    <span id="custom-angle-val" class="text-blue-400">0°</span>
+                  </div>
+                  <input type="range" id="custom-angle" min="-180" max="180" value="0" />
+                </div>
+              </div>
+            </section>
+
+            <!-- TOOL 5: FILTERS & COLOR ADJUSTMENTS -->
+            <section id="panel-filters" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">🎨 Photo Filters & Document Scan</h3>
+                <p class="text-xs text-sub">लाइट, कंट्रास्ट, कलर और डॉक्यूमेंट स्कैन इफेक्ट्स लगाएं।</p>
+              </div>
+
+              <!-- 1-Click Filter Presets -->
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="filter-preset-btn py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold" data-preset="original">Original</button>
+                <button type="button" class="filter-preset-btn py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold" data-preset="docscan">📄 Doc Scan</button>
+                <button type="button" class="filter-preset-btn py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold" data-preset="vivid">✨ Vivid</button>
+                <button type="button" class="filter-preset-btn py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold" data-preset="bw">🖤 Classic B&W</button>
+                <button type="button" class="filter-preset-btn py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold" data-preset="vintage">🎞️ Vintage</button>
+                <button type="button" class="filter-preset-btn py-2 px-2 rounded-xl surface-input border hover:border-blue-500 text-xs font-bold" data-preset="invert">🔄 Invert</button>
+              </div>
+
+              <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Brightness</span><span id="val-brightness">100%</span></div>
+                  <input type="range" class="filter-slider" id="flt-brightness" min="0" max="200" value="100" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Contrast</span><span id="val-contrast">100%</span></div>
+                  <input type="range" class="filter-slider" id="flt-contrast" min="0" max="200" value="100" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Saturation</span><span id="val-saturate">100%</span></div>
+                  <input type="range" class="filter-slider" id="flt-saturate" min="0" max="200" value="100" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Grayscale</span><span id="val-grayscale">0%</span></div>
+                  <input type="range" class="filter-slider" id="flt-grayscale" min="0" max="100" value="0" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Sepia</span><span id="val-sepia">0%</span></div>
+                  <input type="range" class="filter-slider" id="flt-sepia" min="0" max="100" value="0" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Hue Rotate</span><span id="val-hue">0°</span></div>
+                  <input type="range" class="filter-slider" id="flt-hue" min="0" max="360" value="0" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Blur</span><span id="val-blur">0px</span></div>
+                  <input type="range" class="filter-slider" id="flt-blur" min="0" max="20" value="0" />
+                </div>
+              </div>
+            </section>
+
+            <!-- TOOL 6: WATERMARK & TEXT ADDER -->
+            <section id="panel-watermark" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">©️ Watermark & Text Adder</h3>
+                <p class="text-xs text-sub">अपनी फोटो या डॉक्यूमेंट पर कस्टम टेक्स्ट या वॉटरमार्क जोड़ें।</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-sub mb-1">Watermark Text</label>
+                <input type="text" id="wm-text" value="SONI DIGITAL STUDIO" placeholder="Enter watermark text..." class="w-full px-3 py-2 rounded-xl surface-input border text-sm font-medium" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-sub mb-1">Font Size (px)</label>
+                  <input type="number" id="wm-size" value="36" min="8" max="300" class="w-full px-3 py-2 rounded-xl surface-input border text-sm font-bold" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-sub mb-1">Text Color</label>
+                  <div class="flex items-center gap-2">
+                    <input type="color" id="wm-color" value="#ffffff" class="w-10 h-9 rounded cursor-pointer bg-transparent border-0" />
+                    <span id="wm-color-hex" class="text-xs font-mono text-sub">#ffffff</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Opacity</span><span id="wm-opacity-val">65%</span></div>
+                  <input type="range" id="wm-opacity" min="5" max="100" value="65" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1"><span>Rotation</span><span id="wm-rot-val">0°</span></div>
+                  <input type="range" id="wm-rot" min="-90" max="90" value="0" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-sub mb-1.5">Position (स्थान चुनें)</label>
+                <select id="wm-pos" class="w-full px-3 py-2.5 rounded-xl surface-input border text-sm font-semibold">
+                  <option value="bottom-right">Bottom Right (नीचे दाएं)</option>
+                  <option value="bottom-left">Bottom Left (नीचे बाएं)</option>
+                  <option value="center">Center (बीच में)</option>
+                  <option value="top-left">Top Left (ऊपर बाएं)</option>
+                  <option value="top-right">Top Right (ऊपर दाएं)</option>
+                  <option value="tiled">Tiled Pattern (पूरी फोटो पर तिरछा)</option>
+                </select>
+              </div>
+            </section>
+
+            <!-- TOOL 7: BASE64 & COLOR PICKER -->
+            <section id="panel-base64" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">🧬 Color Picker & Base64 Encoder</h3>
+                <p class="text-xs text-sub">प्रिव्यू इमेज पर कहीं भी क्लिक करके HEX कलर कोड निकालें या Base64 कॉपी करें।</p>
+              </div>
+
+              <!-- Eyedropper Picked Color -->
+              <div class="surface-input border rounded-xl p-3.5 space-y-2.5">
+                <div class="text-xs font-bold">🎯 Eyedropper Picked Color (फोटो पर क्लिक करें)</div>
+                <div class="flex items-center gap-3">
+                  <div id="picked-color-swatch" class="w-12 h-12 rounded-xl border border-white/20 shadow-inner shrink-0" style="background-color: #3b82f6;"></div>
+                  <div class="flex-1 space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span id="picked-hex" class="text-sm font-mono font-bold">#3B82F6</span>
+                      <button type="button" id="copy-hex-btn" class="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-xs font-semibold">Copy HEX</button>
+                    </div>
+                    <div id="picked-rgb" class="text-xs font-mono text-sub">rgb(59, 130, 246)</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dominant Color Palette -->
+              <div>
+                <div class="text-xs font-bold text-sub mb-2">🎨 Extracted Dominant Palette (Click to Copy)</div>
+                <div id="palette-container" class="grid grid-cols-6 gap-2"></div>
+              </div>
+
+              <!-- Base64 Output -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-sub">Base64 Data URI String</span>
+                  <button type="button" id="copy-base64-btn" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">
+                    Copy Base64
+                  </button>
+                </div>
+                <textarea id="base64-output" rows="4" readonly class="w-full p-2.5 rounded-xl surface-input border text-[11px] font-mono text-sub resize-none focus:outline-none"></textarea>
+              </div>
+            </section>
+
+            <!-- TOOL 8: PASSPORT PHOTO SHEET & MERGE -->
+            <section id="panel-passport" class="tool-panel hidden space-y-4">
+              <div class="border-b border-theme pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">🪪 Passport Photo Sheet & Stitcher</h3>
+                <p class="text-xs text-sub">प्रिंट करने के लिए एक क्लिक में A4 या 4×6 पासपोर्ट शीट बनाएं या 2 फोटो जोड़ें।</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-sub mb-1.5">Sheet / Merge Mode</label>
+                <select id="sheet-mode" class="w-full px-3 py-2.5 rounded-xl surface-input border text-sm font-semibold">
+                  <option value="4x6-8">4×6 Inch Sheet — 8 Passport Photos (2×4)</option>
+                  <option value="a4-30">A4 Sheet — 30 Passport Photos (5×6)</option>
+                  <option value="a4-12">A4 Sheet — 12 Passport Photos (3×4)</option>
+                  <option value="merge-h">Merge 2 Photos Side-by-Side (आगे-पीछे जोड़ें)</option>
+                  <option value="merge-v">Merge 2 Photos Top-Bottom (ऊपर-नीचे जोड़ें)</option>
+                </select>
+              </div>
+
+              <!-- Second Image Uploader for Merge Mode -->
+              <div id="merge-second-box" class="hidden surface-input border rounded-xl p-3 space-y-2">
+                <label class="block text-xs font-bold">Select 2nd Image (जैसे आधार कार्ड की बैक साइड)</label>
+                <input type="file" id="second-img-input" accept="image/*" class="text-xs w-full" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" id="sheet-cut-lines" checked class="w-4 h-4 accent-blue-600" />
+                  <span>Cut Borders (कटिंग लाइन)</span>
+                </label>
+                <div>
+                  <label class="block text-[11px] text-sub">Gap (px)</label>
+                  <input type="number" id="sheet-gap" value="24" min="0" max="100" class="w-full px-2.5 py-1 rounded-lg surface-input border text-xs font-bold" />
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- RIGHT: LIVE CANVAS PREVIEW WORKSPACE (7 cols on XL) -->
+          <div class="xl:col-span-7 surface-card border rounded-2xl p-4 flex flex-col">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-sub" id="preview-mode-label">Live Output Preview</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" id="toggle-compare-btn" class="px-3 py-1.5 rounded-lg surface-input border hover:border-blue-500 text-xs font-semibold transition">
+                  👁️ Hold to Compare Original
+                </button>
+              </div>
+            </div>
+
+            <!-- Canvas Viewport -->
+            <div id="canvas-stage" class="checkerboard rounded-xl border border-theme relative flex items-center justify-center overflow-hidden min-h-[340px] sm:min-h-[460px] p-3">
+              <canvas id="preview-canvas" class="max-w-full max-h-[65vh] rounded shadow-2xl object-contain"></canvas>
+              <canvas id="crop-canvas" class="hidden max-w-full max-h-[65vh] rounded shadow-2xl"></canvas>
+              <div id="original-overlay" class="hidden absolute inset-0 bg-black/80 flex items-center justify-center p-3">
+                <img id="original-compare-img" alt="Original" class="max-w-full max-h-[65vh] rounded object-contain" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-amber-500 text-black text-xs font-extrabold">ORIGINAL IMAGE</span>
+              </div>
+            </div>
+
+            <div class="mt-3 flex flex-wrap items-center justify-between text-[11px] text-dim gap-2">
+              <span id="canvas-hint-text">💡 Tip: Click "Apply Changes" to stack multiple edits together!</span>
+              <span>Powered by HTML5 Canvas Engine • Zero Data Upload</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: COPY FULL HTML SOURCE CODE
+       ======================================================================== -->
+  <div id="code-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="surface-card border rounded-2xl max-w-3xl w-full p-5 sm:p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-theme pb-3">
+        <div>
+          <h3 class="text-lg font-bold">📋 Copy Complete Standalone HTML Source Code</h3>
+          <p class="text-xs text-sub">इसे कॉपी करके किसी भी .html फाइल, Blogger या GitHub Pages पर सीधे पेस्ट करें।</p>
+        </div>
+        <button id="close-code-modal-btn" class="p-2 rounded-lg surface-input border hover:border-red-500 text-sm font-bold">✕</button>
+      </div>
+      <textarea id="full-source-textarea" rows="12" readonly class="w-full p-3 rounded-xl surface-input border text-xs font-mono text-emerald-400 focus:outline-none"></textarea>
+      <div class="flex justify-end gap-3">
+        <button id="download-html-file-btn" class="px-4 py-2.5 rounded-xl surface-input border hover:border-blue-500 text-xs sm:text-sm font-bold">
+          ⬇️ Download index.html
+        </button>
+        <button id="copy-full-html-btn" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-lg">
+          📋 Copy All Code to Clipboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- ========================================================================
+       JAVASCRIPT APPLICATION ENGINE (100% CLIENT-SIDE)
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         APPLICATION STATE
+         ---------------------------------------------------------------------- */
+      const state = {
+        activeTool: 'compress',
+        originalFile: null,
+        originalDataUrl: '',
+        originalSizeBytes: 0,
+        baseImage: null,       // HTMLImageElement currently being edited
+        secondImage: null,      // Optional 2nd image for merge tool
+        fileName: 'soni-studio-image',
+        outputMime: 'image/jpeg',
+        outputExt: 'jpg',
+        outputDataUrl: '',
+        outputBlob: null,
+
+        // Tool 1: Compress
+        compQuality: 0.80,
+        compFormat: 'image/jpeg',
+
+        // Tool 2: Convert
+        convFormat: 'image/png',
+        convExt: 'png',
+        convBgColor: '#ffffff',
+        convQuality: 0.92,
+
+        // Tool 3: Resize
+        resizeW: 800,
+        resizeH: 600,
+        lockRatio: true,
+        aspectRatio: 1,
+
+        // Tool 4: Crop & Rotate
+        rotation90: 0,
+        customAngle: 0,
+        flipH: false,
+        flipV: false,
+        cropRatio: 'free',
+        cropBox: { x: 0.1, y: 0.1, w: 0.8, h: 0.8 }, // Normalized 0..1
+        isDraggingCrop: false,
+        cropStart: { x: 0, y: 0 },
+
+        // Tool 5: Filters
+        filters: {
+          brightness: 100,
+          contrast: 100,
+          saturate: 100,
+          grayscale: 0,
+          sepia: 0,
+          hue: 0,
+          blur: 0
+        },
+
+        // Tool 6: Watermark
+        wmText: 'SONI DIGITAL STUDIO',
+        wmSize: 36,
+        wmColor: '#ffffff',
+        wmOpacity: 0.65,
+        wmRot: 0,
+        wmPos: 'bottom-right',
+
+        // Tool 8: Passport Sheet / Merge
+        sheetMode: '4x6-8',
+        sheetCutLines: true,
+        sheetGap: 24
+      };
+
+      /* ----------------------------------------------------------------------
+         DOM ELEMENTS CACHE
+         ---------------------------------------------------------------------- */
+      const els = {
+        fileInput: document.getElementById('global-file-input'),
+        dropzoneHero: document.getElementById('dropzone-hero'),
+        workspace: document.getElementById('studio-workspace'),
+        previewCanvas: document.getElementById('preview-canvas'),
+        cropCanvas: document.getElementById('crop-canvas'),
+        statFilename: document.getElementById('stat-filename'),
+        statDimensions: document.getElementById('stat-dimensions'),
+        statOrigSize: document.getElementById('stat-orig-size'),
+        statNewSize: document.getElementById('stat-new-size'),
+        statBadge: document.getElementById('stat-badge'),
+        toastContainer: document.getElementById('toast-container')
+      };
+
+      const ctx = els.previewCanvas.getContext('2d');
+      const cropCtx = els.cropCanvas.getContext('2d');
+
+      /* ----------------------------------------------------------------------
+         UTILITY FUNCTIONS
+         ---------------------------------------------------------------------- */
+      function showToast(msg) {
+        const div = document.createElement('div');
+        div.className = 'toast-item';
+        div.textContent = msg;
+        els.toastContainer.appendChild(div);
+        setTimeout(() => {
+          div.style.opacity = '0';
+          div.style.transform = 'translateX(30px)';
+          div.style.transition = 'all 0.25s ease';
+          setTimeout(() => div.remove(), 260);
+        }, 2800);
+      }
+
+      function formatBytes(bytes) {
+        if (!bytes || bytes <= 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      function dataURLToBlob(dataURL) {
+        const parts = dataURL.split(',');
+        const mime = parts[0].match(/:(.*?);/)[1];
+        const bstr = atob(parts[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        return new Blob([u8arr], { type: mime });
+      }
+
+      function copyTextSafe(text, successMsg = 'Copied to clipboard!') {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.style.position = 'fixed';
+        temp.style.left = '-9999px';
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+          document.execCommand('copy');
+          showToast('✅ ' + successMsg);
+        } catch (err) {
+          showToast('⚠️ Copy failed. Please copy manually.');
+        }
+        document.body.removeChild(temp);
+      }
+
+      /* ----------------------------------------------------------------------
+         THEME TOGGLE & SIDEBAR MOBILE MENU
+         ---------------------------------------------------------------------- */
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+
+      themeBtn.addEventListener('click', () => {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        sunIcon.classList.toggle('hidden', next === 'dark');
+        moonIcon.classList.toggle('hidden', next === 'light');
+      });
+
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+        backdrop.classList.toggle('hidden');
+      });
+      backdrop.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      });
+
+      /* ----------------------------------------------------------------------
+         IMAGE LOADING (FILE, DRAG & DROP, PASTE, SAMPLE)
+         ---------------------------------------------------------------------- */
+      function loadImageFromFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          showToast('⚠️ Please select a valid image file.');
+          return;
+        }
+        state.originalFile = file;
+        state.originalSizeBytes = file.size;
+        state.fileName = file.name.replace(/\.[^/.]+$/, '') || 'image';
+        els.statFilename.textContent = file.name;
+        els.statOrigSize.textContent = formatBytes(file.size);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          state.originalDataUrl = e.target.result;
+          document.getElementById('original-compare-img').src = e.target.result;
+          initBaseImage(e.target.result, true);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function initBaseImage(src, resetControls = false) {
+        const img = new Image();
+        img.onload = () => {
+          state.baseImage = img;
+          state.resizeW = img.naturalWidth;
+          state.resizeH = img.naturalHeight;
+          state.aspectRatio = img.naturalWidth / img.naturalHeight;
+          document.getElementById('resize-w').value = state.resizeW;
+          document.getElementById('resize-h').value = state.resizeH;
+          document.getElementById('resize-pct').value = 100;
+          document.getElementById('resize-pct-val').textContent = '100%';
+
+          if (resetControls) {
+            resetToolStates();
+          }
+
+          els.dropzoneHero.classList.add('hidden');
+          els.workspace.classList.remove('hidden');
+
+          extractDominantPalette(img);
+          renderPipeline();
+        };
+        img.src = src;
+      }
+
+      function resetToolStates() {
+        state.rotation90 = 0;
+        state.customAngle = 0;
+        state.flipH = false;
+        state.flipV = false;
+        state.cropBox = { x: 0.1, y: 0.1, w: 0.8, h: 0.8 };
+        document.getElementById('custom-angle').value = 0;
+        document.getElementById('custom-angle-val').textContent = '0°';
+        applyFilterPreset('original', false);
+      }
+
+      // Generate a rich sample image locally via Canvas (no external URL dependency)
+      document.getElementById('load-sample-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const c = document.createElement('canvas');
+        c.width = 1200;
+        c.height = 800;
+        const g = c.getContext('2d');
+        const grad = g.createLinearGradient(0, 0, 1200, 800);
+        grad.addColorStop(0, '#1e3a8a');
+        grad.addColorStop(0.5, '#7c3aed');
+        grad.addColorStop(1, '#db2777');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 1200, 800);
+
+        // Decorative geometric circles
+        g.fillStyle = 'rgba(255,255,255,0.12)';
+        g.beginPath(); g.arc(280, 260, 180, 0, Math.PI * 2); g.fill();
+        g.beginPath(); g.arc(950, 560, 240, 0, Math.PI * 2); g.fill();
+
+        g.fillStyle = '#ffffff';
+        g.font = 'bold 56px Inter, sans-serif';
+        g.textAlign = 'center';
+        g.fillText('SONI DIGITAL IMAGE STUDIO', 600, 380);
+        g.font = '500 28px Inter, sans-serif';
+        g.fillStyle = '#e2e8f0';
+        g.fillText('Sample High-Resolution Canvas • 1200 × 800 px', 600, 435);
+
+        c.toBlob((blob) => {
+          const sampleFile = new File([blob], 'sample-studio-photo.jpg', { type: 'image/jpeg' });
+          loadImageFromFile(sampleFile);
+          showToast('🎉 Sample photo loaded!');
+        }, 'image/jpeg', 0.92);
+      });
+
+      // Upload Triggers
+      document.getElementById('header-upload-btn').addEventListener('click', () => els.fileInput.click());
+      document.getElementById('hero-select-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        els.fileInput.click();
+      });
+      els.dropzoneHero.addEventListener('click', () => els.fileInput.click());
+      els.fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) loadImageFromFile(e.target.files[0]);
+      });
+
+      // Drag & Drop anywhere on window
+      window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        els.dropzoneHero.classList.add('border-blue-500', 'bg-blue-500/5');
+      });
+      window.addEventListener('dragleave', () => {
+        els.dropzoneHero.classList.remove('border-blue-500', 'bg-blue-500/5');
+      });
+      window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        els.dropzoneHero.classList.remove('border-blue-500', 'bg-blue-500/5');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          loadImageFromFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      // Paste from Clipboard (Ctrl+V)
+      window.addEventListener('paste', (e) => {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (const item of items) {
+          if (item.type.indexOf('image') === 0) {
+            loadImageFromFile(item.getAsFile());
+            showToast('📋 Image pasted from clipboard!');
+            break;
+          }
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL NAVIGATION SWITCHER
+         ---------------------------------------------------------------------- */
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          state.activeTool = btn.dataset.tool;
+          document.querySelectorAll('.tool-panel').forEach((p) => p.classList.add('hidden'));
+          document.getElementById('panel-' + state.activeTool).classList.remove('hidden');
+
+          // Close mobile drawer
+          sidebar.classList.add('-translate-x-full');
+          backdrop.classList.add('hidden');
+
+          // Toggle Crop Overlay Canvas vs Standard Preview Canvas
+          if (state.activeTool === 'crop') {
+            els.previewCanvas.classList.add('hidden');
+            els.cropCanvas.classList.remove('hidden');
+            document.getElementById('preview-mode-label').textContent = 'Interactive Crop & Rotate Stage';
+            document.getElementById('canvas-hint-text').textContent = '✂️ Drag on the image to draw a custom crop box, then click "Crop Selected Area".';
+          } else {
+            els.cropCanvas.classList.add('hidden');
+            els.previewCanvas.classList.remove('hidden');
+            document.getElementById('preview-mode-label').textContent = 'Live Output Preview';
+            document.getElementById('canvas-hint-text').textContent =
+              state.activeTool === 'base64'
+                ? '🎯 Click anywhere on the image preview to pick its exact HEX & RGB color!'
+                : '💡 Tip: Click "Apply Changes" to bake this edit and switch to another tool!';
+          }
+
+          if (state.baseImage) renderPipeline();
+        });
+      });
+
+      /* ----------------------------------------------------------------------
+         MAIN RENDERING PIPELINE
+         ---------------------------------------------------------------------- */
+      function renderPipeline() {
+        if (!state.baseImage) return;
+
+        // If Crop tool is active, draw interactive crop stage
+        if (state.activeTool === 'crop') {
+          drawCropStage();
+        }
+
+        // Determine target output dimensions
+        let outW = state.baseImage.naturalWidth;
+        let outH = state.baseImage.naturalHeight;
+
+        if (state.activeTool === 'resize') {
+          outW = Math.max(1, parseInt(state.resizeW) || outW);
+          outH = Math.max(1, parseInt(state.resizeH) || outH);
+        }
+
+        // Handle Passport Sheet / Merge special canvas layout
+        if (state.activeTool === 'passport') {
+          renderPassportOrMerge();
+          return;
+        }
+
+        // Handle rotation bounding box when rotated
+        const totalDeg = (state.rotation90 + state.customAngle) % 360;
+        const rad = (totalDeg * Math.PI) / 180;
+        const absCos = Math.abs(Math.cos(rad));
+        const absSin = Math.abs(Math.sin(rad));
+
+        let finalW = outW;
+        let finalH = outH;
+        if (totalDeg !== 0) {
+          finalW = Math.round(outW * absCos + outH * absSin);
+          finalH = Math.round(outW * absSin + outH * absCos);
+        }
+
+        // Special case: ICO format export caps at 64x64
+        if (state.activeTool === 'convert' && state.convFormat === 'image/x-icon') {
+          finalW = 64;
+          finalH = 64;
+        }
+
+        els.previewCanvas.width = finalW;
+        els.previewCanvas.height = finalH;
+        ctx.clearRect(0, 0, finalW, finalH);
+
+        // Background fill for formats without transparency (JPG/BMP)
+        const targetMime = getTargetMime();
+        if (targetMime === 'image/jpeg' || targetMime === 'image/bmp') {
+          ctx.fillStyle = state.activeTool === 'convert' ? state.convBgColor : '#ffffff';
+          ctx.fillRect(0, 0, finalW, finalH);
+        }
+
+        // Apply CSS-compatible Canvas Filters
+        const f = state.filters;
+        ctx.filter = `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturate}%) grayscale(${f.grayscale}%) sepia(${f.sepia}%) hue-rotate(${f.hue}deg) blur(${f.blur}px)`;
+
+        // Transform & Draw Image
+        ctx.save();
+        ctx.translate(finalW / 2, finalH / 2);
+        if (totalDeg !== 0) ctx.rotate(rad);
+        ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
+        ctx.drawImage(state.baseImage, -outW / 2, -outH / 2, outW, outH);
+        ctx.restore();
+
+        // Reset filter before drawing Watermark
+        ctx.filter = 'none';
+
+        if (state.activeTool === 'watermark' && state.wmText.trim() !== '') {
+          drawWatermark(ctx, finalW, finalH);
+        }
+
+        exportAndCalculateSize(finalW, finalH);
+      }
+
+      function getTargetMime() {
+        if (state.activeTool === 'compress') return state.compFormat;
+        if (state.activeTool === 'convert') {
+          return state.convFormat === 'image/x-icon' ? 'image/png' : state.convFormat;
+        }
+        return state.originalFile && state.originalFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      }
+
+      function getTargetQuality() {
+        if (state.activeTool === 'compress') return state.compQuality;
+        if (state.activeTool === 'convert') return state.convQuality;
+        return 0.92;
+      }
+
+      function exportAndCalculateSize(w, h) {
+        const mime = getTargetMime();
+        const quality = getTargetQuality();
+        const dataUrl = els.previewCanvas.toDataURL(mime, quality);
+        state.outputDataUrl = dataUrl;
+        state.outputBlob = dataURLToBlob(dataUrl);
+
+        // Update Top Stats
+        els.statDimensions.textContent = `${w} × ${h} px`;
+        const newBytes = state.outputBlob.size;
+        els.statNewSize.textContent = formatBytes(newBytes);
+
+        if (state.originalSizeBytes > 0) {
+          const diffPct = Math.round(((state.originalSizeBytes - newBytes) / state.originalSizeBytes) * 100);
+          if (diffPct >= 0) {
+            els.statBadge.textContent = `-${diffPct}% Saved`;
+            els.statBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400';
+          } else {
+            els.statBadge.textContent = `+${Math.abs(diffPct)}%`;
+            els.statBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400';
+          }
+        }
+
+        // Update Base64 textarea if on Base64 tab
+        if (state.activeTool === 'base64') {
+          document.getElementById('base64-output').value = dataUrl;
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         TOOL 1: COMPRESSOR EVENTS & AUTO KB OPTIMIZER
+         ---------------------------------------------------------------------- */
+      const compQualitySlider = document.getElementById('comp-quality');
+      compQualitySlider.addEventListener('input', (e) => {
+        state.compQuality = parseInt(e.target.value) / 100;
+        document.getElementById('comp-quality-val').textContent = e.target.value + '%';
+        renderPipeline();
+      });
+
+      document.querySelectorAll('.comp-fmt-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.comp-fmt-btn').forEach((b) => {
+            b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+            b.classList.add('surface-input');
+          });
+          btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+          btn.classList.remove('surface-input');
+          state.compFormat = btn.dataset.fmt;
+          renderPipeline();
+        });
+      });
+
+      function optimizeToTargetKB(targetKB) {
+        if (!state.baseImage || !targetKB || targetKB <= 0) return;
+        const targetBytes = targetKB * 1024;
+        let low = 0.01;
+        let high = 1.0;
+        let bestQ = 0.5;
+
+        // Binary search over quality (8 iterations = sub-1% precision)
+        for (let i = 0; i < 8; i++) {
+          const mid = (low + high) / 2;
+          const testUrl = els.previewCanvas.toDataURL(state.compFormat, mid);
+          const size = dataURLToBlob(testUrl).size;
+          if (size <= targetBytes) {
+            bestQ = mid;
+            low = mid;
+          } else {
+            high = mid;
+          }
+        }
+
+        state.compQuality = bestQ;
+        const pct = Math.max(1, Math.round(bestQ * 100));
+        compQualitySlider.value = pct;
+        document.getElementById('comp-quality-val').textContent = pct + '%';
+        renderPipeline();
+        showToast(`🎯 Optimized near ${targetKB} KB (Quality: ${pct}%)`);
+      }
+
+      document.getElementById('target-kb-btn').addEventListener('click', () => {
+        const val = parseFloat(document.getElementById('target-kb-input').value);
+        optimizeToTargetKB(val);
+      });
+
+      document.querySelectorAll('.kb-quick-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const kb = parseFloat(btn.dataset.kb);
+          document.getElementById('target-kb-input').value = kb;
+          optimizeToTargetKB(kb);
+        });
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL 2: FORMAT CONVERTER EVENTS
+         ---------------------------------------------------------------------- */
+      document.querySelectorAll('.conv-fmt-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.conv-fmt-btn').forEach((b) => {
+            b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+            b.classList.add('surface-input');
+          });
+          btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+          btn.classList.remove('surface-input');
+          state.convFormat = btn.dataset.fmt;
+          state.convExt = btn.dataset.ext;
+          renderPipeline();
+        });
+      });
+
+      document.getElementById('conv-bg-color').addEventListener('input', (e) => {
+        state.convBgColor = e.target.value;
+        renderPipeline();
+      });
+
+      document.getElementById('conv-quality').addEventListener('input', (e) => {
+        state.convQuality = parseInt(e.target.value) / 100;
+        document.getElementById('conv-quality-val').textContent = e.target.value + '%';
+        renderPipeline();
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL 3: RESIZER & PRESETS EVENTS
+         ---------------------------------------------------------------------- */
+      const resizeWInput = document.getElementById('resize-w');
+      const resizeHInput = document.getElementById('resize-h');
+      const lockRatioChk = document.getElementById('resize-lock-ratio');
+      const resizePctSlider = document.getElementById('resize-pct');
+
+      resizeWInput.addEventListener('input', () => {
+        const w = parseInt(resizeWInput.value) || 1;
+        state.resizeW = w;
+        if (lockRatioChk.checked && state.aspectRatio) {
+          state.resizeH = Math.max(1, Math.round(w / state.aspectRatio));
+          resizeHInput.value = state.resizeH;
+        }
+        renderPipeline();
+      });
+
+      resizeHInput.addEventListener('input', () => {
+        const h = parseInt(resizeHInput.value) || 1;
+        state.resizeH = h;
+        if (lockRatioChk.checked && state.aspectRatio) {
+          state.resizeW = Math.max(1, Math.round(h * state.aspectRatio));
+          resizeWInput.value = state.resizeW;
+        }
+        renderPipeline();
+      });
+
+      resizePctSlider.addEventListener('input', () => {
+        if (!state.baseImage) return;
+        const pct = parseInt(resizePctSlider.value);
+        document.getElementById('resize-pct-val').textContent = pct + '%';
+        state.resizeW = Math.max(1, Math.round((state.baseImage.naturalWidth * pct) / 100));
+        state.resizeH = Math.max(1, Math.round((state.baseImage.naturalHeight * pct) / 100));
+        resizeWInput.value = state.resizeW;
+        resizeHInput.value = state.resizeH;
+        renderPipeline();
+      });
+
+      document.querySelectorAll('.resize-preset-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const w = parseInt(btn.dataset.w);
+          const h = parseInt(btn.dataset.h);
+          lockRatioChk.checked = false;
+          state.resizeW = w;
+          state.resizeH = h;
+          resizeWInput.value = w;
+          resizeHInput.value = h;
+          renderPipeline();
+          showToast(`📐 Applied preset: ${w} × ${h} px`);
+        });
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL 4: INTERACTIVE CROP, ROTATE & FLIP
+         ---------------------------------------------------------------------- */
+      function drawCropStage() {
+        if (!state.baseImage) return;
+        const img = state.baseImage;
+        const maxDisplayW = 760;
+        const scale = Math.min(1, maxDisplayW / img.naturalWidth);
+        const cw = Math.round(img.naturalWidth * scale);
+        const ch = Math.round(img.naturalHeight * scale);
+
+        els.cropCanvas.width = cw;
+        els.cropCanvas.height = ch;
+
+        // Draw base image
+        cropCtx.clearRect(0, 0, cw, ch);
+        cropCtx.drawImage(img, 0, 0, cw, ch);
+
+        // Darken outside crop box
+        const bx = state.cropBox.x * cw;
+        const by = state.cropBox.y * ch;
+        const bw = state.cropBox.w * cw;
+        const bh = state.cropBox.h * ch;
+
+        cropCtx.fillStyle = 'rgba(0, 0, 0, 0.58)';
+        cropCtx.fillRect(0, 0, cw, by);
+        cropCtx.fillRect(0, by + bh, cw, ch - (by + bh));
+        cropCtx.fillRect(0, by, bx, bh);
+        cropCtx.fillRect(bx + bw, by, cw - (bx + bw), bh);
+
+        // Draw crisp crop border + rule-of-thirds grid
+        cropCtx.strokeStyle = '#3b82f6';
+        cropCtx.lineWidth = 2.5;
+        cropCtx.strokeRect(bx, by, bw, bh);
+
+        cropCtx.strokeStyle = 'rgba(255,255,255,0.35)';
+        cropCtx.lineWidth = 1;
+        cropCtx.beginPath();
+        cropCtx.moveTo(bx + bw / 3, by); cropCtx.lineTo(bx + bw / 3, by + bh);
+        cropCtx.moveTo(bx + (2 * bw) / 3, by); cropCtx.lineTo(bx + (2 * bw) / 3, by + bh);
+        cropCtx.moveTo(bx, by + bh / 3); cropCtx.lineTo(bx + bw, by + bh / 3);
+        cropCtx.moveTo(bx, by + (2 * bh) / 3); cropCtx.lineTo(bx + bw, by + (2 * bh) / 3);
+        cropCtx.stroke();
+      }
+
+      function getPointerNorm(e) {
+        const rect = els.cropCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)),
+          y: Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
+        };
+      }
+
+      function startCropDrag(e) {
+        state.isDraggingCrop = true;
+        state.cropStart = getPointerNorm(e);
+      }
+
+      function moveCropDrag(e) {
+        if (!state.isDraggingCrop) return;
+        e.preventDefault();
+        const curr = getPointerNorm(e);
+        let x = Math.min(state.cropStart.x, curr.x);
+        let y = Math.min(state.cropStart.y, curr.y);
+        let w = Math.abs(curr.x - state.cropStart.x);
+        let h = Math.abs(curr.y - state.cropStart.y);
+
+        if (state.cropRatio !== 'free' && state.baseImage) {
+          const targetRatio = parseFloat(state.cropRatio);
+          const imgRatio = state.baseImage.naturalWidth / state.baseImage.naturalHeight;
+          h = (w * imgRatio) / targetRatio;
+          if (y + h > 1) {
+            h = 1 - y;
+            w = (h * targetRatio) / imgRatio;
+          }
+        }
+
+        state.cropBox = { x, y, w: Math.max(0.02, w), h: Math.max(0.02, h) };
+        drawCropStage();
+      }
+
+      function endCropDrag() {
+        state.isDraggingCrop = false;
+      }
+
+      els.cropCanvas.addEventListener('mousedown', startCropDrag);
+      window.addEventListener('mousemove', moveCropDrag);
+      window.addEventListener('mouseup', endCropDrag);
+      els.cropCanvas.addEventListener('touchstart', startCropDrag, { passive: false });
+      window.addEventListener('touchmove', moveCropDrag, { passive: false });
+      window.addEventListener('touchend', endCropDrag);
+
+      document.querySelectorAll('.crop-ratio-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.crop-ratio-btn').forEach((b) => {
+            b.classList.remove('bg-blue-600', 'text-white');
+            b.classList.add('surface-input', 'border');
+          });
+          btn.classList.add('bg-blue-600', 'text-white');
+          btn.classList.remove('surface-input', 'border');
+          state.cropRatio = btn.dataset.ratio;
+          drawCropStage();
+        });
+      });
+
+      document.getElementById('reset-crop-box-btn').addEventListener('click', () => {
+        state.cropBox = { x: 0.1, y: 0.1, w: 0.8, h: 0.8 };
+        drawCropStage();
+      });
+
+      document.getElementById('exec-crop-btn').addEventListener('click', () => {
+        if (!state.baseImage) return;
+        const img = state.baseImage;
+        const sx = Math.round(state.cropBox.x * img.naturalWidth);
+        const sy = Math.round(state.cropBox.y * img.naturalHeight);
+        const sw = Math.max(1, Math.round(state.cropBox.w * img.naturalWidth));
+        const sh = Math.max(1, Math.round(state.cropBox.h * img.naturalHeight));
+
+        const temp = document.createElement('canvas');
+        temp.width = sw;
+        temp.height = sh;
+        temp.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+        state.cropBox = { x: 0, y: 0, w: 1, h: 1 };
+        initBaseImage(temp.toDataURL('image/png'), false);
+        showToast(`✂️ Cropped to ${sw} × ${sh} px`);
+      });
+
+      document.getElementById('rot-left-btn').addEventListener('click', () => {
+        state.rotation90 = (state.rotation90 - 90) % 360;
+        renderPipeline();
+      });
+      document.getElementById('rot-right-btn').addEventListener('click', () => {
+        state.rotation90 = (state.rotation90 + 90) % 360;
+        renderPipeline();
+      });
+      document.getElementById('flip-h-btn').addEventListener('click', () => {
+        state.flipH = !state.flipH;
+        renderPipeline();
+      });
+      document.getElementById('flip-v-btn').addEventListener('click', () => {
+        state.flipV = !state.flipV;
+        renderPipeline();
+      });
+      document.getElementById('custom-angle').addEventListener('input', (e) => {
+        state.customAngle = parseInt(e.target.value);
+        document.getElementById('custom-angle-val').textContent = state.customAngle + '°';
+        renderPipeline();
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL 5: FILTERS & DOCUMENT SCAN PRESETS
+         ---------------------------------------------------------------------- */
+      function applyFilterPreset(preset, shouldRender = true) {
+        const presets = {
+          original: { brightness: 100, contrast: 100, saturate: 100, grayscale: 0, sepia: 0, hue: 0, blur: 0 },
+          docscan:  { brightness: 118, contrast: 165, saturate: 0, grayscale: 100, sepia: 0, hue: 0, blur: 0 },
+          vivid:    { brightness: 106, contrast: 120, saturate: 145, grayscale: 0, sepia: 0, hue: 0, blur: 0 },
+          bw:       { brightness: 102, contrast: 125, saturate: 0, grayscale: 100, sepia: 0, hue: 0, blur: 0 },
+          vintage:  { brightness: 105, contrast: 95, saturate: 85, grayscale: 0, sepia: 55, hue: 0, blur: 0 },
+          invert:   { brightness: 100, contrast: 100, saturate: 100, grayscale: 0, sepia: 0, hue: 180, blur: 0 }
+        };
+        const p = presets[preset] || presets.original;
+        state.filters = { ...p };
+
+        document.getElementById('flt-brightness').value = p.brightness;
+        document.getElementById('val-brightness').textContent = p.brightness + '%';
+        document.getElementById('flt-contrast').value = p.contrast;
+        document.getElementById('val-contrast').textContent = p.contrast + '%';
+        document.getElementById('flt-saturate').value = p.saturate;
+        document.getElementById('val-saturate').textContent = p.saturate + '%';
+        document.getElementById('flt-grayscale').value = p.grayscale;
+        document.getElementById('val-grayscale').textContent = p.grayscale + '%';
+        document.getElementById('flt-sepia').value = p.sepia;
+        document.getElementById('val-sepia').textContent = p.sepia + '%';
+        document.getElementById('flt-hue').value = p.hue;
+        document.getElementById('val-hue').textContent = p.hue + '°';
+        document.getElementById('flt-blur').value = p.blur;
+        document.getElementById('val-blur').textContent = p.blur + 'px';
+
+        if (shouldRender) renderPipeline();
+      }
+
+      document.querySelectorAll('.filter-preset-btn').forEach((btn) => {
+        btn.addEventListener('click', () => applyFilterPreset(btn.dataset.preset, true));
+      });
+
+      document.querySelectorAll('.filter-slider').forEach((slider) => {
+        slider.addEventListener('input', () => {
+          const key = slider.id.replace('flt-', '');
+          const val = parseInt(slider.value);
+          state.filters[key] = val;
+          const unit = key === 'hue' ? '°' : key === 'blur' ? 'px' : '%';
+          document.getElementById('val-' + key).textContent = val + unit;
+          renderPipeline();
+        });
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL 6: WATERMARK & TEXT ADDER
+         ---------------------------------------------------------------------- */
+      function drawWatermark(c, w, h) {
+        c.save();
+        c.globalAlpha = state.wmOpacity;
+        c.fillStyle = state.wmColor;
+        c.font = `bold ${state.wmSize}px Inter, sans-serif`;
+        c.textBaseline = 'middle';
+
+        const pad = Math.max(20, state.wmSize * 0.8);
+        const rad = (state.wmRot * Math.PI) / 180;
+
+        if (state.wmPos === 'tiled') {
+          c.textAlign = 'center';
+          const stepX = Math.max(220, c.measureText(state.wmText).width + 90);
+          const stepY = Math.max(120, state.wmSize * 3);
+          for (let y = 0; y < h + stepY; y += stepY) {
+            for (let x = 0; x < w + stepX; x += stepX) {
+              c.save();
+              c.translate(x, y);
+              c.rotate(rad || -0.45);
+              c.fillText(state.wmText, 0, 0);
+              c.restore();
+            }
+          }
+        } else {
+          let tx = w / 2;
+          let ty = h / 2;
+          c.textAlign = 'center';
+
+          if (state.wmPos === 'top-left') { tx = pad; ty = pad; c.textAlign = 'left'; }
+          else if (state.wmPos === 'top-right') { tx = w - pad; ty = pad; c.textAlign = 'right'; }
+          else if (state.wmPos === 'bottom-left') { tx = pad; ty = h - pad; c.textAlign = 'left'; }
+          else if (state.wmPos === 'bottom-right') { tx = w - pad; ty = h - pad; c.textAlign = 'right'; }
+
+          c.translate(tx, ty);
+          c.rotate(rad);
+          c.shadowColor = 'rgba(0,0,0,0.45)';
+          c.shadowBlur = 6;
+          c.fillText(state.wmText, 0, 0);
+        }
+        c.restore();
+      }
+
+      document.getElementById('wm-text').addEventListener('input', (e) => { state.wmText = e.target.value; renderPipeline(); });
+      document.getElementById('wm-size').addEventListener('input', (e) => { state.wmSize = parseInt(e.target.value) || 24; renderPipeline(); });
+      document.getElementById('wm-color').addEventListener('input', (e) => {
+        state.wmColor = e.target.value;
+        document.getElementById('wm-color-hex').textContent = e.target.value;
+        renderPipeline();
+      });
+      document.getElementById('wm-opacity').addEventListener('input', (e) => {
+        state.wmOpacity = parseInt(e.target.value) / 100;
+        document.getElementById('wm-opacity-val').textContent = e.target.value + '%';
+        renderPipeline();
+      });
+      document.getElementById('wm-rot').addEventListener('input', (e) => {
+        state.wmRot = parseInt(e.target.value);
+        document.getElementById('wm-rot-val').textContent = e.target.value + '°';
+        renderPipeline();
+      });
+      document.getElementById('wm-pos').addEventListener('change', (e) => { state.wmPos = e.target.value; renderPipeline(); });
+
+      /* ----------------------------------------------------------------------
+         TOOL 7: EYEDROPPER COLOR PICKER, PALETTE & BASE64
+         ---------------------------------------------------------------------- */
+      function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+      }
+
+      els.previewCanvas.addEventListener('click', (e) => {
+        if (state.activeTool !== 'base64') return;
+        const rect = els.previewCanvas.getBoundingClientRect();
+        const x = Math.floor(((e.clientX - rect.left) / rect.width) * els.previewCanvas.width);
+        const y = Math.floor(((e.clientY - rect.top) / rect.height) * els.previewCanvas.height);
+        const pixel = ctx.getImageData(x, y, 1, 1).data;
+        const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
+
+        document.getElementById('picked-color-swatch').style.backgroundColor = hex;
+        document.getElementById('picked-hex').textContent = hex;
+        document.getElementById('picked-rgb').textContent = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+        showToast(`🎯 Picked Color: ${hex}`);
+      });
+
+      function extractDominantPalette(img) {
+        const c = document.createElement('canvas');
+        c.width = 40;
+        c.height = 40;
+        const g = c.getContext('2d');
+        g.drawImage(img, 0, 0, 40, 40);
+        const data = g.getImageData(0, 0, 40, 40).data;
+
+        const colorMap = {};
+        for (let i = 0; i < data.length; i += 16) {
+          // Quantize to reduce noise
+          const r = Math.round(data[i] / 32) * 32;
+          const gVal = Math.round(data[i + 1] / 32) * 32;
+          const b = Math.round(data[i + 2] / 32) * 32;
+          const hex = rgbToHex(Math.min(255, r), Math.min(255, gVal), Math.min(255, b));
+          colorMap[hex] = (colorMap[hex] || 0) + 1;
+        }
+
+        const topColors = Object.entries(colorMap)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 6)
+          .map((item) => item[0]);
+
+        const container = document.getElementById('palette-container');
+        container.innerHTML = '';
+        topColors.forEach((hex) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'h-10 rounded-xl border border-white/20 shadow flex items-end justify-center pb-1 text-[9px] font-mono font-bold text-white';
+          btn.style.backgroundColor = hex;
+          btn.style.textShadow = '0 1px 2px rgba(0,0,0,0.8)';
+          btn.textContent = hex;
+          btn.addEventListener('click', () => copyTextSafe(hex, `Copied ${hex}`));
+          container.appendChild(btn);
+        });
+      }
+
+      document.getElementById('copy-hex-btn').addEventListener('click', () => {
+        copyTextSafe(document.getElementById('picked-hex').textContent, 'HEX Color Copied!');
+      });
+      document.getElementById('copy-base64-btn').addEventListener('click', () => {
+        copyTextSafe(document.getElementById('base64-output').value, 'Base64 String Copied!');
+      });
+
+      /* ----------------------------------------------------------------------
+         TOOL 8: PASSPORT PHOTO SHEET & MERGE STITCHER
+         ---------------------------------------------------------------------- */
+      const sheetModeSel = document.getElementById('sheet-mode');
+      sheetModeSel.addEventListener('change', (e) => {
+        state.sheetMode = e.target.value;
+        const isMerge = state.sheetMode.startsWith('merge');
+        document.getElementById('merge-second-box').classList.toggle('hidden', !isMerge);
+        renderPipeline();
+      });
+
+      document.getElementById('second-img-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            state.secondImage = img;
+            renderPipeline();
+            showToast('✅ 2nd image merged!');
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById('sheet-cut-lines').addEventListener('change', (e) => {
+        state.sheetCutLines = e.target.checked;
+        renderPipeline();
+      });
+      document.getElementById('sheet-gap').addEventListener('input', (e) => {
+        state.sheetGap = parseInt(e.target.value) || 0;
+        renderPipeline();
+      });
+
+      function renderPassportOrMerge() {
+        const img1 = state.baseImage;
+        const gap = state.sheetGap;
+
+        if (state.sheetMode.startsWith('merge')) {
+          const img2 = state.secondImage || img1;
+          if (state.sheetMode === 'merge-h') {
+            const targetH = Math.max(img1.naturalHeight, img2.naturalHeight);
+            const w1 = Math.round((img1.naturalWidth / img1.naturalHeight) * targetH);
+            const w2 = Math.round((img2.naturalWidth / img2.naturalHeight) * targetH);
+            const totalW = w1 + w2 + gap;
+            els.previewCanvas.width = totalW;
+            els.previewCanvas.height = targetH;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, totalW, targetH);
+            ctx.drawImage(img1, 0, 0, w1, targetH);
+            ctx.drawImage(img2, w1 + gap, 0, w2, targetH);
+            exportAndCalculateSize(totalW, targetH);
+          } else {
+            const targetW = Math.max(img1.naturalWidth, img2.naturalWidth);
+            const h1 = Math.round((img1.naturalHeight / img1.naturalWidth) * targetW);
+            const h2 = Math.round((img2.naturalHeight / img2.naturalWidth) * targetW);
+            const totalH = h1 + h2 + gap;
+            els.previewCanvas.width = targetW;
+            els.previewCanvas.height = totalH;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, targetW, totalH);
+            ctx.drawImage(img1, 0, 0, targetW, h1);
+            ctx.drawImage(img2, 0, h1 + gap, targetW, h2);
+            exportAndCalculateSize(targetW, totalH);
+          }
+          return;
+        }
+
+        // Printable Grid Sheets @ 300 DPI
+        let sheetW = 1800, sheetH = 1200, cols = 4, rows = 2; // 4x6 inch landscape = 8 photos
+        if (state.sheetMode === 'a4-30') {
+          sheetW = 2480; sheetH = 3508; cols = 5; rows = 6;
+        } else if (state.sheetMode === 'a4-12') {
+          sheetW = 2480; sheetH = 3508; cols = 3; rows = 4;
+        }
+
+        els.previewCanvas.width = sheetW;
+        els.previewCanvas.height = sheetH;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, sheetW, sheetH);
+
+        const margin = Math.max(40, gap);
+        const cellW = Math.floor((sheetW - margin * 2 - gap * (cols - 1)) / cols);
+        const cellH = Math.floor((sheetH - margin * 2 - gap * (rows - 1)) / rows);
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const x = margin + c * (cellW + gap);
+            const y = margin + r * (cellH + gap);
+            ctx.drawImage(img1, x, y, cellW, cellH);
+
+            if (state.sheetCutLines) {
+              ctx.strokeStyle = '#334155';
+              ctx.lineWidth = 3;
+              ctx.strokeRect(x, y, cellW, cellH);
+            }
+          }
+        }
+
+        exportAndCalculateSize(sheetW, sheetH);
+      }
+
+      /* ----------------------------------------------------------------------
+         GLOBAL WORKSPACE BUTTONS (APPLY, RESET, COMPARE, DOWNLOAD)
+         ---------------------------------------------------------------------- */
+      document.getElementById('apply-to-base-btn').addEventListener('click', () => {
+        if (!state.outputDataUrl) return;
+        initBaseImage(state.outputDataUrl, true);
+        showToast('✅ Edits applied! You can now use another tool on this result.');
+      });
+
+      document.getElementById('reset-all-btn').addEventListener('click', () => {
+        if (!state.originalDataUrl) return;
+        initBaseImage(state.originalDataUrl, true);
+        showToast('↺ Restored to original image.');
+      });
+
+      // Hold-to-Compare Original Image
+      const compareBtn = document.getElementById('toggle-compare-btn');
+      const originalOverlay = document.getElementById('original-overlay');
+      compareBtn.addEventListener('mousedown', () => originalOverlay.classList.remove('hidden'));
+      compareBtn.addEventListener('mouseup', () => originalOverlay.classList.add('hidden'));
+      compareBtn.addEventListener('mouseleave', () => originalOverlay.classList.add('hidden'));
+      compareBtn.addEventListener('touchstart', (e) => { e.preventDefault(); originalOverlay.classList.remove('hidden'); });
+      compareBtn.addEventListener('touchend', () => originalOverlay.classList.add('hidden'));
+
+      // Download Processed Image
+      document.getElementById('download-btn').addEventListener('click', () => {
+        if (!state.outputDataUrl) return;
+        let ext = 'jpg';
+        if (state.activeTool === 'convert') ext = state.convExt;
+        else if (state.activeTool === 'compress') ext = state.compFormat === 'image/webp' ? 'webp' : 'jpg';
+        else if (getTargetMime() === 'image/png') ext = 'png';
+
+        const link = document.createElement('a');
+        link.download = `${state.fileName}-soni-studio.${ext}`;
+        link.href = state.outputDataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast(`⬇️ Downloading ${link.download}`);
+      });
+
+      /* ----------------------------------------------------------------------
+         COPY FULL HTML SOURCE CODE MODAL
+         ---------------------------------------------------------------------- */
+      const codeModal = document.getElementById('code-modal');
+      const sourceTextarea = document.getElementById('full-source-textarea');
+
+      document.getElementById('open-code-modal-btn').addEventListener('click', () => {
+        sourceTextarea.value = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        codeModal.classList.remove('hidden');
+      });
+      document.getElementById('close-code-modal-btn').addEventListener('click', () => {
+        codeModal.classList.add('hidden');
+      });
+      document.getElementById('copy-full-html-btn').addEventListener('click', () => {
+        copyTextSafe(sourceTextarea.value, 'Complete HTML Code Copied! Paste into any .html file.');
+      });
+      document.getElementById('download-html-file-btn').addEventListener('click', () => {
+        const blob = new Blob([sourceTextarea.value], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'soni-digital-image-studio.html';
+        a.click();
+        showToast('⬇️ Downloaded soni-digital-image-studio.html');
+      });
+
+    })();
+  </script>
+</body>
+</html>
